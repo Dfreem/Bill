@@ -1,6 +1,7 @@
 import pygame
 import game
-from utility import manager
+from BillGame.states.menu import MainMenu
+from BillGame.states.random_level import LevelRand
 
 """
 Meta - scope algorythm
@@ -18,17 +19,23 @@ This file starts the motion of the game,
 if __name__ == '__main__':
 
     SETTINGS = {
-        'win_width':1000,
-        'win_height': 800,
+        'win_width': 1200,
+        'win_height': 600,
         'fps': 60,
-        'sky': pygame.Color('#B4D0F0')
+        'sky_color': pygame.Color('#B4D0F0')
     }
 
     print("instantiating game\n...\n...")
 
     # instantiate _game first then make the contexts
     _game = game.Game(**SETTINGS)
-    _manager = manager.StateManager(_game)
+    states = {
+        "main_menu": MainMenu(),
+        "level_rand": LevelRand(),
+    }
+    _game.setup_states("main_menu", **states)
+
+    _game.main_loop()
     print("game created, manager created, :init")
 
 

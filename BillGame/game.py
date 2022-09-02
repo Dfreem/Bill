@@ -1,123 +1,49 @@
 import sys
-
 import pygame
-from pygame import constants, K_p, K_DOWN, KEYUP, KEYDOWN, K_ESCAPE, MOUSEBUTTONDOWN, QUIT
+from pygame import constants, K_p, K_DOWN, KEYUP, KEYDOWN, K_ESCAPE, MOUSEBUTTONDOWN, QUIT, sprite
+from BillGame.utility import bill_event
+from BillGame.utility.bill_event import START_BUTTON, LEVEL_BUTTON
 from characters.bill import BulletBill
 from pause import pause
-from states.base import BaseState
 
 
 class Game:
-    def __init__(self, **settings):
-        self.is_paused = False
-        self.tick = None
-        self.tick = 0.0
+    ui_container = sprite.OrderedUpdates()
+    bg_container = sprite.Group()
+    bricks = sprite.Group()
+    clouds = sprite.LayeredUpdates()
 
+    def __init__(self, **settings):
+        pygame.init()
+        self.tick = None
         self.state = None
         self.state_name = ""
-
-        # player / character
-        self._bill = BulletBill()
-
-        self.window_size = (settings['win_width'], settings['win_width'])
-        self.window = None
+        self.states = None
+        self.is_paused = False
         self.settings = settings
-        self.state: BaseState
+
         self.clock = pygame.time.Clock()
-
-    def init(self):
-        pygame.init()
-
-        # setting up a game window
-        self.window = pygame.display.set_mode(
-            self.window_size,
-            flags=pygame.constants.FULLSCREEN,
-            display=1,
-            vsync=1
-        )
+        self.window_size = (settings['win_width'], settings['win_height'])
 
         # restricting events
         pygame.event.set_allowed([
             KEYDOWN,
             KEYUP,
-            K_DOWN,
-            K_p,
-            K_ESCAPE,
+            START_BUTTON,
+            LEVEL_BUTTON,
             MOUSEBUTTONDOWN,
         ])
 
-        self.window = pygame.display.set_mode(self.window_size).convert()
-        self.window.fill(self.settings['sky_color'])
-        self.state.state_setup(self._bill, self.window)
-        self.state.done = False
+        # setting up a game window
+        self.window = pygame.display.set_mode(
+            self.window_size,
+            depth=32,
+            flags=constants.NOFRAME,
+            vsync=1
+        )
 
-    def setup_states(self, state_name, **states):
-        """
-        Called one time to transfer constructors and names as a dictionary
-
-        :type state_name: str
-        :param state_name:
-        :type states: states.base.BaseState
-        :param states: a dictionary of state object that inherit from BaseState
-        :return: None
-        """
-        self.state = states[state_name]
-        self.state_name = state_name
-
-    def process_events(self, event):
-        self.state.get_event(event)
-        if event.type == KEYDOWN:
-            if event.key == K_p:
-                pause(self.is_paused, self.window)
-            if event.key == K_ESCAPE or event.type == QUIT:
-                pygame.display.quit()
-                pygame.quit()
-                sys.exit()
-
-    def update(self):
-        """
-        The Game class' version of update first calls the states version,
-        then passes the rects returned by state, to the display.
-        update method.
-
-         ... probably
-
-        :return: None
-        """
-        returned_rects = self.state.render_state()
-        pygame.display.update(returned_rects)
-
-    def render(self):
-        pass
-
-    def main_loop(self):
-        self.init()
-        while not self.state.done:
-            if not self.is_paused:
-
-                self.tick = self.clock.tick(self.settings['fps']) / 1000.0
-
-                for event in pygame.event.get():
-                    self.process_events(event)
-                pygame.event.pump()
-
-                self.update()
-                self.render()
-
-    @property
-    def game_window(self):
-        return self.window
-
-    @game_window.setter
-    def game_window(self, value):
-        """
-        :type value: pygame.Surface
-        :param value: a changed or initial copy / version of the game window
-        :return: None
-        """
-        if value != self.window:
-            value.convert()
-            self.window = value
+        # player / character
+        self._bill = BulletBill()
 
     @property
     def get_settings(self):
@@ -134,6 +60,89 @@ class Game:
     @get_bill.setter
     def get_bill(self, value):
         self._bill = value
+
+    def setup_states(self, start_state, **states):
+        """
+        Called one time to transfer constructors and names as a dictionary
+
+        :type start_state: str
+        :param start_state: which state to start on
+        :param states: a dictionary of state object that inherit from BaseState
+        :return: None
+        """
+        self.states = states
+        self.state = states[start_state]
+        self.state_name = start_state
+        self.window.fill(self.settings['sky_color'])
+        self.state.state_setup(self._bill, self.window)
+        self.state.done = False
+
+    def process_events(self, event):
+        print(event)
+        self.state.get_event(event)
+        if event.type == KEYDOWN:
+            if event.key == K_p:
+                pause(self.is_paused, self.window)
+            if event.key == K_ESCAPE or event.type == QUIT:
+                pygame.display.quit()
+                pygame.quit()
+                sys.exit()
+
+    def update(self, time_delta):
+        """
+        The Game class' version of update first calls the states version,
+        then passes the rects returned by state, to the display.
+        update method.
+
+         ... probably
+
+        :return: None
+        """
+        self.window.fill(self.settings['sky_color'])
+        self.state.render_state(self.window, time_delta)
+
+        pygame.display.update()
+
+    def main_loop(self):
+        self.state.done = False
+        while not self.state.done:
+            if not self.is_paused:
+
+                self.tick = self.clock.tick(self.settings['fps']) / 1000.0
+
+                for event in pygame.event.get():
+                    self.process_events(event)
+                pygame.event.pump()
+
+                self.update(self.tick)
+        else:
+            self.flip_state()
+
+    def flip_state(self):
+        """
+        switch current state to next state
+
+        :return: None
+
+        switcheroo automatically, simultaneously swaps
+        the current string name of the state w/ -> previous state position
+                                    - and -
+        next state position w/ -> current string state name"""
+
+        self.state.done = False
+        self.state.cleanup()
+
+        print("flipping states from: " + repr(self))
+
+        previous, self.state_name = self.state_name, self.state.next
+        self.is_paused = False
+        self.state = self.states[self.state_name]
+        self.state.cleanup()
+        print("to: " + repr(self))
+        self.state.state_setup(self.get_bill, self.window)
+        self.state.on_run()
+        self.state.previous = previous
+        self.main_loop()
 
 # import sys
 # from abc import ABC, abstractmethod

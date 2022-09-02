@@ -4,19 +4,11 @@ from pygame.sprite import Sprite, AbstractGroup
 
 class MenuButton(Sprite):
 
-    def __init__(self, filepath=None, placement=(0, 0), parent_func='print("not implemented")'):
-        """
-        game button model.
+    def __init__(self, filepath=None, placement=(0, 0)):
 
-        :param text: the text on the button and the name sent as on_click.
-        :param size: button size
-        :param placement: where to put the button on the game window
-        :param parent_func: a string representation of the method inside the parent state,
-        to call when this button is clicked.
-        """
         super(MenuButton, self).__init__()
-
         self.butt_event = None
+
         # default filepath if none is given
         if filepath is None:
             filepath = "images/start_btn.png"
@@ -25,8 +17,9 @@ class MenuButton(Sprite):
         # temporary rect holder, don't delete
         self.rect = self.image.get_rect()
         self.is_clicked = False
+
         # can't beat 'em, join em.
-        self.update = super().update
+        # self.update = super().update
         size = self.rect.size
 
         # default location of button if None is given

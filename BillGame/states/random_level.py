@@ -2,9 +2,9 @@ import random
 
 import pygame.constants
 
-from game import Game, BaseState
-from states.pieces.brick import Brick
-from states.pieces.cloud import Cloud
+from BillGame.states.base import BaseState
+from BillGame.states.pieces.brick import Brick
+from BillGame.states.pieces.cloud import Cloud
 
 
 def gain_speed(v):
@@ -34,7 +34,7 @@ class LevelRand(BaseState):
 
         # background
         self.bg = pygame.image.load('images/bg.png').convert_alpha()
-        pygame.transform.smoothscale(self.bg, (1200, 600))
+        self.bg = pygame.transform.smoothscale(self.bg, (1200, 600))
         self.bg_rect = self.bg.get_rect()
         self.bg.set_alpha(80)
 
@@ -43,6 +43,7 @@ class LevelRand(BaseState):
         self.win_height = None
 
         # game
+        self.done = False
         self.next = 'main_menu'
         self.previous = 'main_menu'
         self.player = None
@@ -86,9 +87,9 @@ class LevelRand(BaseState):
         window.fill(pygame.Color('#B4D0F0'))
         window.blit(self.bg, (self.bg_rect.x, self.bg_rect.y))
         window.blit(self.bg, (self.bg_rect.x + self.bg_rect.width, self.bg_rect.y))
-        self.bricks = move_bricks(self.bricks)
-        self.clouds_rear = move_bricks(self.clouds_rear, 3)
-        self.clouds_front = move_bricks(self.clouds_front, 5)
+        self.bricks = self.move_bricks(self.bricks)
+        self.clouds_rear = self.move_bricks(self.clouds_rear, 3)
+        self.clouds_front = self.move_bricks(self.clouds_front, 5)
         window.blits(self.clouds_rear)
         window.blits(self.bricks)
         window.blit(self.player.image, (self.player.rect.x, self.player.rect.y))
@@ -101,25 +102,24 @@ class LevelRand(BaseState):
 
         if keys[pygame.K_UP]:
             self.player.rect.y += self.player.vel_up
-        self.character.draw(Game.window)
 
     def on_run(self):
-        self.window.blits([self.bg, (0, 0), (self.bg, (1000, 0))])
+        self.window.blits([(self.bg, (0, 0)), (self.bg, (1000, 0))])
         # self.window.blit(self.bg, (1000, 0))
         self.window.blits(self.bricks)
         self.window.blits(self.clouds_rear)
         self.window.blit(self.player.image, self.player.rect)
 
-def move_bricks(bricks, speed=4):
-    holder = []
-    for i in range(len(bricks)):
-        img, rct = bricks[i]
-        if rct.x > -600:
-            rct.x -= speed
-        else:
-            rct.x += self.window.get_width() * 2
-        holder.append((img, rct))
-    return holder
+    def move_bricks(self, bricks, speed=4):
+        holder = []
+        for i in range(len(bricks)):
+            img, rct = bricks[i]
+            if rct.x > -600:
+                rct.x -= speed
+            else:
+                rct.x + self.win_width * 2
+            holder.append((img, rct))
+        return holder
 
 
 
