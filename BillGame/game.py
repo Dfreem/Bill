@@ -9,7 +9,7 @@ from pause import pause
 
 class Game:
     ui_container = sprite.OrderedUpdates()
-    bg_container = sprite.Group()
+    bg_container = sprite.OrderedUpdates()
     bricks = sprite.Group()
     clouds = sprite.LayeredUpdates()
 
@@ -78,7 +78,6 @@ class Game:
         self.state.done = False
 
     def process_events(self, event):
-        print(event)
         self.state.get_event(event)
         if event.type == KEYDOWN:
             if event.key == K_p:
@@ -99,6 +98,7 @@ class Game:
         :return: None
         """
         self.window.fill(self.settings['sky_color'])
+
         self.state.render_state(self.window, time_delta)
 
         pygame.display.update()

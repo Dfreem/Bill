@@ -1,3 +1,5 @@
+import random
+
 import pygame
 
 from BillGame.utility.button import MenuButton
@@ -39,4 +41,69 @@ def create_button(filepath=None, x=None, y=None):
         y_butt = ya
 
     return MenuButton(filepath=filepath, placement=(x_butt - (75 / 2), y_butt))
+
+
+def rand_spot(thing, window):
+    """
+    :type thing: object { object.x, object.y }
+    :param thing: the thing to move. The object must have and self.x and self.y
+    :type window: pygame.Surface
+    :param window: the game window
+    """
+    x, y = window.get_size()
+    thing.x = random.randint(-600, x + 600)
+    thing.y = random.randint(0, y)
+
+
+class BrickHead:
+    def __init__(self):
+        self.next_item= None
+        self.x = 0
+        self.y = 0
+        self.direction = 1
+        self._speed = 4
+        self.hopper = []
+        self.hopper_is_empty = True
+        self.rect = pygame.rect.Rect((self.x, self.y), (0, 0))
+
+    def fill_hopper(self, *items):
+        self.hopper.append(*items)
+        self.hopper_is_empty = False
+
+    def in_motion(self, window):
+        """
+        :type window: pygame.Surface
+        """
+        limit_y = window.get_size()[0]
+
+        if not self.hopper_is_empty:
+
+            if self.y <= limit_y + 100 and self.direction == 1:
+                self.y += self._speed
+                if not self.y <= limit_y + 100:
+                    self.direction = 0
+            elif self.y >= 0 and self.direction == 0:
+                self.y -= self._speed
+                if not self.y >= 0:
+                    self.direction = 1
+
+    def drop(self, window):
+        if not self.hopper_is_empty:
+            window.blit(self.hopper[0], (self.x, self.y))
+            # much the front spite to the back of the line
+            self.hopper.append(self.hopper.pop(0))
+
+    def update(self, delta_time):
+        # TODO stopped here,
+        #  this needs to compare to delta time and release on self.frequency
+        pass
+
+    @property
+    def speed(self):
+        return self._speed
+
+    @speed.setter
+    def speed(self, value):
+        if 1 <= value <= 10 and value == type(int):
+            self.speed = value
 

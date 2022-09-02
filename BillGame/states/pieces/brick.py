@@ -13,8 +13,9 @@ class Brick(Sprite):
     def __init__(self):
         super(Brick, self).__init__()
         # stats
-        self.y = None
-        self.x = None
+        self.size = None
+        self.y = 0
+        self.x = 0
         self.width = 16
         self.height = 16
         self._hp = 10
@@ -30,13 +31,6 @@ class Brick(Sprite):
         self.image = pygame.Surface.subsurface(self.image, [0, 0], [self.width, self.height]).convert_alpha()
         self.image = pygame.transform.smoothscale(self.image, (30, 30))
         self.rect = self.image.get_rect()
-
-    def rand_spot(self, handler):
-
-        self.x = random.randint(-500, self.win_size[0] * 2)
-        self.y = random.randint(0, self.win_size[1])
-        self.rect = rect.Rect((self.x, self.y), (16, 16))
-        handler.append((self.image, self.rect))
 
     @property
     def hp(self):
@@ -56,7 +50,7 @@ class Brick(Sprite):
             self._is_breakable = value
 
     def get_smashed(self):
-        pass
+        self.kill()
 
     def take_damage(self, value):
         self.hp -= value

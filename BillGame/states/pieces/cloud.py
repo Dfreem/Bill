@@ -1,10 +1,10 @@
 import pygame
 
-from states.pieces import brick
+from BillGame.states.pieces import brick
 
 
-class Cloud(brick.Brick):
-    filepath = "images/desert_back4.png"
+class Cloud:
+    filepath = 'images/desert_back4.png'
 
     def __init__(self, foreground=False):
         super().__init__()
@@ -12,6 +12,7 @@ class Cloud(brick.Brick):
         if foreground:
             self.in_front()
         self.rect = self.image.get_rect()
+        self.x, self.y = self.rect.size
 
     def in_front(self):
         self.image = pygame.transform.smoothscale(self.image, (800, 550))
