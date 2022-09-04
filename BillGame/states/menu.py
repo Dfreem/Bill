@@ -1,12 +1,13 @@
 import pygame.display
-from BillGame.game import Game
-from BillGame.states.base import BaseState
-from BillGame.utility import bill_event
-from BillGame.utility.__utility__ import create_button
-from BillGame.utility.bill_event import START_BUTTON, LEVEL_BUTTON
+from game import Game
+from states.base import BaseState
+from utility import bill_event
+from utility.__utility__ import create_button
+from utility.bill_event import START_BUTTON, LEVEL_BUTTON
 
 
 class MainMenu(BaseState):
+
     def __init__(self):
         super(MainMenu, self).__init__()
         self.done = False
@@ -55,10 +56,12 @@ class MainMenu(BaseState):
     def cleanup(self):
         Game.ui_container.empty()
 
-    def render_state(self, window, time_delta):
+    def render_state(self, window):
         window.blit(self.background, (0, 0))
         Game.ui_container.draw(window)
 
+    def update(self, window):
+        pass
 #
 # def create_button(filepath=None, x=None, y=None, parent_func='print("not implemented in menu")'):
 #     """

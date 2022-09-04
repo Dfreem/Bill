@@ -1,10 +1,12 @@
 import sys
+
 import pygame
-from pygame import constants, K_p, K_DOWN, KEYUP, KEYDOWN, K_ESCAPE, MOUSEBUTTONDOWN, QUIT, sprite
-from BillGame.utility import bill_event
-from BillGame.utility.bill_event import START_BUTTON, LEVEL_BUTTON
+from pygame import constants, K_p, KEYUP, KEYDOWN, K_ESCAPE, MOUSEBUTTONDOWN, QUIT, sprite
+
 from characters.bill import BulletBill
 from pause import pause
+from utility import __utility__
+from utility.bill_event import START_BUTTON, LEVEL_BUTTON
 
 
 class Game:
@@ -19,6 +21,7 @@ class Game:
         self.state = None
         self.state_name = ""
         self.states = None
+        self.done = False
         self.is_paused = False
         self.settings = settings
 
@@ -38,9 +41,9 @@ class Game:
         self.window = pygame.display.set_mode(
             self.window_size,
             depth=32,
-            flags=constants.NOFRAME,
-            vsync=1
+            flags=constants.NOFRAME
         )
+        self.window.convert()
 
         # player / character
         self._bill = BulletBill()
@@ -87,26 +90,30 @@ class Game:
                 pygame.quit()
                 sys.exit()
 
-    def update(self, time_delta):
+    def update(self):
         """
-        The Game class' version of update first calls the states version,
-        then passes the rects returned by state, to the display.
-        update method.
-
-         ... probably
+        call all the game components update methods
 
         :return: None
         """
+        # erase contents and start a fresh screen. called once a frame.
         self.window.fill(self.settings['sky_color'])
 
-        self.state.render_state(self.window, time_delta)
+        # update the currently loaded state
+        self.state.update(self.window)
 
+        # demand that the state draw itself.
+        # We won't be pushed around by a state we don't even kow the name of ...
+        self.state.render_state(self.window)
+
+        # onscreen debugger w/ hp and FPS info
+        self.window.blit(__utility__.update_fps(self.clock.get_fps(), self._bill.hp), (50, 50))
         pygame.display.update()
 
     def main_loop(self):
         self.state.done = False
-        while not self.state.done:
-            if not self.is_paused:
+        while not self.done:
+            if not self.is_paused and not self.state.done:
 
                 self.tick = self.clock.tick(self.settings['fps']) / 1000.0
 
@@ -114,9 +121,9 @@ class Game:
                     self.process_events(event)
                 pygame.event.pump()
 
-                self.update(self.tick)
-        else:
-            self.flip_state()
+                self.update()
+            else:
+                self.flip_state()
 
     def flip_state(self):
         """
@@ -136,95 +143,10 @@ class Game:
 
         previous, self.state_name = self.state_name, self.state.next
         self.is_paused = False
-        self.state = self.states[self.state_name]
         self.state.cleanup()
+        self.state = self.states[self.state_name]
         print("to: " + repr(self))
         self.state.state_setup(self.get_bill, self.window)
-        self.state.on_run()
+        self.state.on_run(self.window)
         self.state.previous = previous
-        self.main_loop()
-
-# import sys
-# from abc import ABC, abstractmethod
-# import pygame.event
-# from pygame.constants import QUIT, K_p, KEYDOWN
-# import pause
-# from characters import bill
-# from utility.bill_event import START_BUTTON
-# from utility.manager import Manage
-#
-#     button_handler = Manage()
-#     is_paused = False
-#     window = None
-#     character = None
-#
-#     def __init__(self, **settings):
-#
-#         # start pygame
-#         pygame.init()
-#
-#     def setup_states(self, contexts, start_state):
-#         self.contexts = contexts
-#         self.state_name = start_state
-#         self.state = self.contexts['main_menu']
-#         self.state.state_setup(Game.character, self.window)
-#
-#
-#     def update(self, delta_time):
-#         """
-#         call state_update method inside the current state,
-#         then the button handlers draw_ui method
-#
-#         :param delta_time: clock.tick(fps) / 1000.0
-#         :return: None
-#         """
-#         self.state.state_update(Game.window, delta_time)
-#         # pygame.display.update(changed_rects)
-#
-#     def event_loop(self, delta_time):
-#         """
-#         Handle events in a separate loop than the game loop. here,
-#         each event is passed off to the current state. The event and call are
-#         perpetuated from each state to any buttons or sprites within.
-#
-#         :param delta_time: clock.tick(fps) / 1000.0
-#         :return: None
-#         """
-#         events = pygame.event.get()
-#         for event in events:
-#             self.state.get_event(event)
-#             # passing the event to the current state
-#             if event.type == QUIT or (event.type == KEYDOWN and event.key == pygame.K_ESCAPE) :
-#                 # click close button in corner of window
-#                 pygame.quit()
-#                 sys.exit()
-#
-#             if event.type == KEYDOWN:
-#                 if event.key == K_p:
-#                     self.is_paused = True
-#
-#             if event.type == START_BUTTON:
-#                 self.flip_state()
-#
-#     def main_game_loop(self):
-#         """
-#         The only game loop controlling the flow of the game.
-#         calls event_loop, update then display.update.
-#
-#         :return:
-#         """
-#         fps = self.__dict__['fps']
-#         while not self.done:
-#             if not self.is_paused:
-#                 tick = self.clock.tick(fps)
-#                 delta_time = tick / 1000.0
-#                 self.event_loop(delta_time)
-#                 self.update(self.window)
-#                 Game.button_handler.draw_ui(Game.window)
-#                 pygame.display.flip()
-#             else:
-#                 pygame.display.flip()
-#                 pygame.event.clear()
-#                 self.is_paused = pause.pause(self.is_paused, Game.window)
-#
-#
+        # self.main_loop()

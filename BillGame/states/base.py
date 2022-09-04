@@ -57,7 +57,7 @@ class BaseState(ABC):
         """
 
     @abstractmethod
-    def on_run(self):
+    def on_run(self, window):
         """
         called to start the game loop in the context of this state.
 
@@ -86,9 +86,13 @@ class BaseState(ABC):
         print("cleaning up...")
 
     @abstractmethod
-    def render_state(self, window, time_delta):
+    def render_state(self, window):
         """
         Called once per frame, should be used to call any drawing method.
 
         """
+        pass
+
+    @abstractmethod
+    def update(self, window):
         pass

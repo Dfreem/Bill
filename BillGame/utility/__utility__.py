@@ -2,13 +2,13 @@ import random
 
 import pygame
 
-from BillGame.utility.button import MenuButton
+from utility.button import MenuButton
 
 
-def update_fps(fps):
+def update_fps(fps, hp):
 
     font = pygame.font.SysFont("Futura", 18)
-    fps_text = font.render(f'fps: {fps}', False, 'black')
+    fps_text = font.render(f'fps: {int(fps)}\nplayer hp: {hp}', False, 'lightgreen')
     surf = pygame.Surface((30, 20)).convert_alpha()
     surf.fill("blanchedalmond")
     return fps_text
@@ -51,8 +51,9 @@ def rand_spot(thing, window):
     :param window: the game window
     """
     x, y = window.get_size()
-    thing.x = random.randint(-600, x + 600)
-    thing.y = random.randint(0, y)
+    thing.rect.x = random.randint(-600, x + 600)
+    thing.rect.y = random.randint(0, y)
+    return thing
 
 
 class BrickHead:

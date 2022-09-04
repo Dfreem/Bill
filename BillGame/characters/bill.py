@@ -1,9 +1,9 @@
 import pygame
-from pygame.sprite import DirtySprite
+from pygame.sprite import DirtySprite, Sprite
 
 
-class BulletBill(DirtySprite):
-    bill_vel = 4
+class BulletBill(Sprite):
+    bill_vel = 3
 
     def __init__(self):
         super(BulletBill, self).__init__()
@@ -14,18 +14,16 @@ class BulletBill(DirtySprite):
         """
         print("creating bill")
         # ---- numbers ----
-        self.x = 100
-        self.y = 100
-        self.vel_up = 4
-        self.vel_down = 4
+        self.vel_up = self.bill_vel
+        self.vel_down = self.bill_vel
         self.hp = 100
         self.damage = 20
         self.is_dead = False
-        self.boost = 0
+        self._boost = 0
         self.filepath: str = "images/bullet_bill.png"
         self.image = pygame.image.load(self.filepath).convert_alpha()
         self.image = pygame.transform.smoothscale(self.image, (100, 100))
-        self.rect = self.image.get_rect()
+        self.rect = pygame.rect.Rect((200, 100), (100, 100))
         self.is_hit = self.rect.colliderect(self.rect)
 
         # ---- image ----
@@ -41,23 +39,32 @@ class BulletBill(DirtySprite):
         if damage and not self.is_dead:
             self.hp -= damage
         if self.hp <= 0:
+            print("dead")
             self.is_dead = True
-
-    def bang(self):
-        print("bang")
 
     @property
     def x_coord(self):
-        return self.x
+        return self.rect.x
 
     @x_coord.setter
     def x_coord(self, value):
-        self.x = value
+        self.rect.x = value
 
     @property
     def y_coord(self):
-        return self.y
+        return self.rect.y
 
     @y_coord.setter
     def y_coord(self, value):
-        self.y = value
+        self.rect.y = value
+
+    def get_event(self, event):
+        pass
+
+    @property
+    def boosted(self):
+        return self._boost
+
+    @boosted.setter
+    def boosted(self, value):
+        self._boost = value
