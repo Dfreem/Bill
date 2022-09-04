@@ -42,7 +42,6 @@ class LevelRand(BaseState):
     def state_setup(self, player, window):
         """
         override to notify this state that it will be switched to soon.
-        this is where player and window transfer happen.
 
         :type player: characters.bill.BulletBill
         :param player: the player character (bullet bill)
@@ -126,14 +125,11 @@ class LevelRand(BaseState):
     def get_event(self, event):
         """
         Called when an allowed event is put on the stack
-
-        :type event: pygame.event.Event
-        :param event: filtering for bill_event.BRICK_EVENT
-        :return: None
+        :param event:
+        :return:
         """
-        pass
-        # if event.type == bill_event.BRICK_HIT:
-        #     print(event)
+        if event.type == bill_event.BRICK_HIT:
+            print(event)
 
     def on_run(self, window):
         self.all.extend(self.bricks)
@@ -153,7 +149,6 @@ class LevelRand(BaseState):
     def get_keys(self):
         """
         get the keyboard specific events during this state's gameplay.
-
         :return: None
         """
         keys = pygame.key.get_pressed()
@@ -161,23 +156,17 @@ class LevelRand(BaseState):
         # move player up
         if keys[pygame.K_UP]:
             self.player.y_coord -= self.player.vel_up
-
-            # the player increases velocity as he is moving.
-            # but tops out at top speed(8)
-            if self.player.vel_up < self.player.top_speed:
+            if self.player.vel_up < 8:
                 self.player.vel_up += 0.5
         else:
-            # moving down
             self.player.vel_up = BulletBill.bill_vel
         if keys[pygame.K_DOWN]:
             self.player.y_coord += self.player.vel_down
             if self.player.vel_down < 8:
                 self.player.vel_down += 0.5
         else:
-            # when the player isn't moving, their velocity resets.
             self.player.vel_down = BulletBill.bill_vel
 
-        # if the player goes off the screen upward or downward, they wrap around to the other side.
         if self.player.y_coord < 0:
             self.player.y_coord += self.win_height + 100
 
@@ -208,7 +197,7 @@ class LevelRand(BaseState):
 
     def kill_brick(self, brick):
         brick.image = brick.breaking1
-        if brick.death_timer < 500:
+        if brick.death_timer < 450:
             try:
                 exec(next(brick.exploding))
             except StopIteration:

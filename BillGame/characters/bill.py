@@ -1,5 +1,5 @@
 import pygame
-from pygame.sprite import DirtySprite, Sprite
+from pygame.sprite import Sprite
 
 
 class BulletBill(Sprite):
@@ -8,7 +8,7 @@ class BulletBill(Sprite):
     def __init__(self):
         super(BulletBill, self).__init__()
         """
-        BulletBill represents the player_container class in this game
+        Bill represents the player_container class in this game
 
         :param kwargs: Optionally provide bills image filepath, x and/or z parameters at time of instantiation
         """

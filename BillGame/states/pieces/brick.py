@@ -85,7 +85,7 @@ class Brick(Cloud):
                 self.get_smashed()
 
     def time_death(self):
-        if self.death_timer >= 1000:
+        if self.death_timer >= 500:
             self.death_timer = 0
         else:
             self.death_timer += 1
