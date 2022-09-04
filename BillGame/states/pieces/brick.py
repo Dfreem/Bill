@@ -33,6 +33,7 @@ class Brick(Cloud):
         self._is_breakable = True
         self.is_broken = False
         self.scroll_speed = 5
+        self.is_broken = False
         self.death_timer = 0
 
         # how much damage it deals when interacting
@@ -42,15 +43,15 @@ class Brick(Cloud):
         # ------ self identity / shape ------
         self.filepath = 'images/mario_items.png'
         self.original = pygame.image.load(self.filepath).convert_alpha()
-        self.image = pygame.Surface.subsurface(self.original, [0, 0], [self.width, self.height]).convert_alpha()
+        self.image = pygame.Surface.subsurface(self.original, [0, 0], [self.width, self.height])
         self.breaking1 = pygame.image.load("images/exploding_brick1.png").convert_alpha()
         self.breaking2 = pygame.image.load("images/exploding_brick2.png").convert_alpha()
         self.image = pygame.transform.smoothscale(self.image, (32, 32))
         self.rect = self.image.get_rect()
         explode_sequence = [
-            "self.image.blit(self.breaking1, (0, 0))",
-            "self.image.blit(self.breaking2, (0, 0))",
-            "self.is_broken = True"
+            "brick.image.blit(brick.breaking1, (0, 0))",
+            "brick.image.blit(brick.breaking2, (0, 0))",
+            "brick.is_broken = True"
         ]
         self.exploding = iter(explode_sequence)
 
@@ -75,8 +76,7 @@ class Brick(Cloud):
         if self.is_breakable:
             self.rect.width = 0
             self.rect.height = 0
-            # self.death()
-            self.kill()
+            self.is_broken = True
 
     def take_damage(self, value):
         if not self.is_broken:
@@ -84,13 +84,12 @@ class Brick(Cloud):
             if self.hp <= 0:
                 self.get_smashed()
 
+    def time_death(self):
+        if self.death_timer >= 1000:
+            self.death_timer = 0
+        else:
+            self.death_timer += 1
+
     # stopped here, 09/03/22
-    # def death(self):
-    #     for event in pygame.event.get():
-    #         print(self.death_timer)
-    #         if event.type == bill_event.COUNT_THIS:
-    #             self.death_timer += 1
-    #         if self.death_timer == 500:
-    #             exec(next(self.exploding))
 
 

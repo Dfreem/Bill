@@ -20,6 +20,7 @@ class BulletBill(Sprite):
         self.damage = 20
         self.is_dead = False
         self._boost = 0
+        self.top_speed = 8
         self.filepath: str = "images/bullet_bill.png"
         self.image = pygame.image.load(self.filepath).convert_alpha()
         self.image = pygame.transform.smoothscale(self.image, (100, 100))

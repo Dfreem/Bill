@@ -147,6 +147,6 @@ class Game:
         self.state = self.states[self.state_name]
         print("to: " + repr(self))
         self.state.state_setup(self.get_bill, self.window)
-        self.state.on_run(self.window)
         self.state.previous = previous
+        self.state.on_run(self.window)
         # self.main_loop()
