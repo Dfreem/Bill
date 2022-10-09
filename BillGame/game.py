@@ -1,9 +1,8 @@
 import sys
-
 import pygame
 from pygame import constants, K_p, KEYUP, KEYDOWN, K_ESCAPE, MOUSEBUTTONDOWN, QUIT, sprite
 
-from characters.bill import BulletBill
+from BillGame.characters.bill import BulletBill
 from pause import pause
 from utility import __utility__
 from utility.bill_event import START_BUTTON, LEVEL_BUTTON
@@ -68,6 +67,8 @@ class Game:
         """
         Called one time to transfer constructors and names as a dictionary
 
+        :parameters:
+
         :type start_state: str
         :param start_state: which state to start on
         :param states: a dictionary of state object that inherit from BaseState
@@ -81,9 +82,20 @@ class Game:
         self.state.done = False
 
     def process_events(self, event):
+        """
+        :type event: pygame.event.Event
+        :param event: a pygame.Event object
+        """
+
+        # watch for quit and pause events
         self.state.get_event(event)
         if event.type == KEYDOWN:
             if event.key == K_p:
+
+                # is_paused is a check inside the main loop,
+                # it doesn't end the loop, but it does suspend it,
+                # and switch states. there is currently no pause screen.
+                # TODO create pause screen
                 pause(self.is_paused, self.window)
             if event.key == K_ESCAPE or event.type == QUIT:
                 pygame.display.quit()
@@ -111,6 +123,15 @@ class Game:
         pygame.display.update()
 
     def main_loop(self):
+        """
+        As they say on MTV, so this is where all the magic happens.
+        main_loop is the main game loop. It includes checks for pause and done states.
+        A done states is not necessarily a quit. A done states main role is the end of a level.
+        --------
+
+        Algorythm:
+        """
+
         self.state.done = False
         while not self.done:
             if not self.is_paused and not self.state.done:
@@ -131,21 +152,30 @@ class Game:
 
         :return: None
 
-        switcheroo automatically, simultaneously swaps
-        the current string name of the state w/ -> previous state position
-                                    - and -
-        next state position w/ -> current string state name"""
+        swap the current string name of the state(`BillGame.States.BaseState`)
+        with the previous state_name. Then swap next state position w/ -> current string state name"""
 
         self.state.done = False
         self.state.cleanup()
 
         print("flipping states from: " + repr(self))
 
+        # destructor used to swap variable positions.
+        # state_name is a string, that acts as a key for retrieving that state from the dictionary.
         previous, self.state_name = self.state_name, self.state.next
+
         self.is_paused = False
+
+        # A state should use cleanup to destroy any Objects that need destroying,
+        # transfer or save state.
         self.state.cleanup()
+
+        # Use state_name to retrieve the given state from the dictionary.
         self.state = self.states[self.state_name]
-        print("to: " + repr(self))
+
+        # print("to: " + repr(self)) # TEST
+
+        # This method is to be used for transfer of the player sprite and the window to the state.
         self.state.state_setup(self.get_bill, self.window)
         self.state.previous = previous
         self.state.on_run(self.window)
