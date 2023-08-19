@@ -1,7 +1,7 @@
 import pygame
 import game
-from BillGame.states.menu import MainMenu
-from BillGame.states.random_level import LevelRand
+from states.menu import MainMenu
+from states.random_level import LevelRand
 
 """
 Algorythm

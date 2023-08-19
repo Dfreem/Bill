@@ -2,7 +2,7 @@ import sys
 import pygame
 from pygame import constants, K_p, KEYUP, KEYDOWN, K_ESCAPE, MOUSEBUTTONDOWN, QUIT, sprite
 
-from BillGame.characters.bill import BulletBill
+from characters.bill import BulletBill
 from pause import pause
 from utility import __utility__
 from utility.bill_event import START_BUTTON, LEVEL_BUTTON

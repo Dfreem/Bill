@@ -3,7 +3,7 @@ import asyncio
 import pygame
 from pygame.time import wait
 
-from BillGame.states.pieces.cloud import Cloud
+from states.pieces.cloud import Cloud
 
 
 class Brick(Cloud):

@@ -1,11 +1,10 @@
 import pygame.display
 
-import BillGame
-from BillGame import game
-from BillGame.states.base import BaseState
-from BillGame.utility import bill_event
-from BillGame.utility.__utility__ import create_button
-from BillGame.utility.bill_event import LEVEL_BUTTON
+import game
+from states.base import BaseState
+from utility import bill_event
+from utility.__utility__ import create_button
+from utility.bill_event import LEVEL_BUTTON
 
 
 class MainMenu(BaseState):

@@ -1,11 +1,11 @@
 import random
 import pygame.constants
 
-from BillGame.characters.bill import BulletBill
-from BillGame.states.base import BaseState
-from BillGame.states.pieces.brick import Brick
-from BillGame.states.pieces.cloud import Cloud
-from BillGame.utility import __utility__, bill_event
+from characters.bill import BulletBill
+from states.base import BaseState
+from states.pieces.brick import Brick
+from states.pieces.cloud import Cloud
+from utility import __utility__, bill_event
 
 
 class LevelRand(BaseState):
